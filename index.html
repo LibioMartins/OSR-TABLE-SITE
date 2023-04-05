@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSR-TABLE</title>
+    <style>
+        *{
+            font-size: 1.2em;
+        }
+        body{
+            background-color:rgb(192, 192, 192);
+        }
+        #largura{
+            background-color:black;
+        }
+        
+        output{
+            color: rgb(0, 0, 0);
+            font-size: 1.5em;
+        }
+        canvas { 
+            border: 4px solid rgb(0, 0, 0); 
+            background-image:url("Sem\ título.png");
+                    
+        }
+    </style>
+</head>
+<body>
+    <p> 
+        <abbr title="Quadrado(q)"><input type="button" value="&#9744" onclick="retangulo()"></abbr>
+        <abbr title="Circulo"><input type="button" value="&#9737" onclick="circulo()"></abbr>
+        <abbr title="Reta(r)"><input type="button" value="&#9866" onclick="reta()"></abbr>
+        <abbr title="Lapis(l)"><input type="button" value="&#x270E" onclick="lapis()"></abbr>
+        <abbr title="Borracha(b)"><input type="button" value="&#x2751" onclick="borracha()"></abbr>
+        <input type="button" value="Texto(t)" onclick="texto()">
+        <input id="largura" type="range"  min="1" value="0" max="50" list="ticks" oninput="Output.value = largura.value"list="tickmarks" >
+        <output id="Output">1</output>
+        <select id="cores">
+            <option value="white">White</option>
+            <option value="DarkGray" style="background-color: DarkGray;">DarkGray</option>
+            <option value="Black" style="background-color: black; color: white;">Black</option>
+            <option value="SlateBlue" style="background-color:SlateBlue;">SlateBlue</option>
+            <option value="DeepSkyBlue" style="background-color: DeepSkyBlue;">DeepSkyBlue</option>
+            <option value="Cyan"style="background-color: Cyan">Cyan</option>
+            <option  value="Blue" style="background-color: blue; color: white;">Blue</option>
+            <option value="lime" style="background-color: lime;">lime</option>
+            <option value="SaddleBrown" style="background-color: SaddleBrown;">SaddleBrown</option>
+            <option value="Purple" style="background-color: Purple;">Purple</option>
+            <option value="DeepPink" style="background-color:DeepPink;">DeepPink</option>
+            <option value="Red" style="background-color: Red
+            ;">Red</option>
+            <option value="Orange" style="background-color: Orange;">Orange</option>
+            <option value="Yellow" style="background-color: Yellow;">Yellow</option>
+        </select>
+        <input type="file" id="imagem" accept=".jpg, .jpeg, .png" multiple />
+    </p>
+    <canvas id="tela" width="8000" height="5000"><script>
+        var botao=0;
+        var coress=document.getElementById('cores').value;
+        var tamanhovar=window.document.getElementById("largura");
+        var image
+        var getXCoord 
+        var getYCoord 
+        var pontox=0
+        var pontoy=0
+        var clickado=0
+
+        document.onkeydown = function(e) {//Atalhos teclado(melhorar)
+         if(e.key==="q" && hasInput===false){
+            retangulo();
+         }     
+         if(e.key==="c" && hasInput===false){
+            circulo();
+         }
+         if(e.key==="r" && hasInput===false){
+            reta();
+         }      
+         if(e.key==="l" && hasInput===false){
+            lapis();
+         }  
+         if(e.key==="b"&& hasInput===false){
+            borracha();
+         }
+         if(e.key==="t" && hasInput===false){
+            texto();
+         }
+         if(e.key==="=" && hasInput===false){
+            document.getElementById("largura").value=document.getElementById(`largura`).value/2*2 +1
+            if(Output.value!=50){Output.value=Output.value/2*2 +1}
+        }
+        if(e.key==="-" && hasInput===false){
+            document.getElementById("largura").value=document.getElementById(`largura`).value/2*2 -1
+            if(Output.value!=1){Output.value=Output.value/2*2 -1}
+        }
+    } 
+        //Seleciona modo atraves da variavel "botao"
+        function retangulo(){
+            botao="retangulo"
+        }
+        function circulo(){
+            botao="circulo"
+        }
+        function reta(){
+            botao="reta"
+        }
+        function lapis(){
+            botao="lapis";
+        }
+        function borracha(){
+            botao="borracha"
+        }
+        function texto(){
+            botao="texto";
+        }
+        
+
+       document.addEventListener('DOMContentLoaded',()=>{
+       const pincel={
+        ativo:false,
+        movendo:false,
+        pos:{x:0,y:0},
+        posAnterior:null
+       }
+       const canvas = document.getElementById("tela");
+       const contexto = canvas.getContext("2d"); 
+       //Desenha com a funçao lapis
+       const desenharlapis= (lapis)=>{
+        contexto.strokeStyle=document.getElementById('cores').value;
+        contexto.fillStyle=document.getElementById('cores').value;
+        contexto.lineWidth=largura.value;
+        contexto.beginPath();
+        contexto.moveTo(lapis.posAnterior.x,lapis.posAnterior.y);
+        contexto.lineTo(lapis.pos.x,lapis.pos.y);
+        contexto.stroke();
+        contexto.arc(lapis.posAnterior.x,lapis.posAnterior.y,(largura.value)/2, 0, 2 * Math.PI);
+        contexto.fill();
+        contexto.arc(lapis.pos.x,lapis.pos.y,(largura.value)/2, 0, 2 * Math.PI);
+        contexto.fill();
+       }
+       //Desenha com a funçao borracha
+       const desenharborracha= (lapis)=>{
+        contexto.clearRect(lapis.posAnterior.x-(largura.value)/2, lapis.posAnterior.y-(largura.value)/2,largura.value,largura.value);
+        contexto.clearRect(lapis.pos.x-(largura.value)/2, lapis.pos.y-(largura.value)/2,largura.value,largura.value);
+       }
+       //Detecta mouse pressionado e registra pontos.
+       tela.onmousedown = (evento)=>{pincel.ativo=true
+        if(botao==="reta" || botao==="circulo" || botao==="retangulo"){
+        clickado=clickado+1    
+        }
+        if((botao==="reta" || botao==="circulo" || botao==="retangulo") && clickado===1){
+        pontox=evento.offsetX;
+        pontoy=evento.offsetY;
+       }
+
+       if((botao==="reta" || botao==="circulo" || botao==="retangulo") && clickado===2){
+        const canvas = document.getElementById("tela");
+        const contexto = canvas.getContext("2d");
+        contexto.strokeStyle=document.getElementById('cores').value;
+        contexto.lineWidth=largura.value;
+        if(botao==="retangulo"){
+        contexto.beginPath();
+        contexto.strokeRect(pontox,pontoy,Math.abs(evento.offsetX-pontox),Math.abs(evento.offsetY-pontoy));
+        contexto.stroke();    
+        }
+        if(botao==="circulo"){
+        contexto.beginPath();
+        contexto.arc(pontox, pontoy, Math.abs(evento.offsetX-pontox), 0, Math.PI * 2, true);
+        contexto.stroke();
+        }
+        if(botao==="reta"){
+        contexto.beginPath();
+        contexto.moveTo(pontox,pontoy);
+        contexto.lineTo(evento.offsetX,evento.offsetY);
+        contexto.stroke();
+        }
+        clickado=0
+       }
+       
+       };
+       tela.onmouseup = (evento) => {pincel.ativo=false};
+       
+       //Detecta posiçao do mouse enquato pressionado
+       tela.onmousemove =(evento)=>{
+        pincel.pos.x=evento.offsetX 
+        pincel.pos.y=evento.offsetY
+        pincel.movendo=true;
+       }
+
+       // Repete a funçao lapis e borracha para criar efeito de desenho.
+       const ciclo =()=>{
+        if(pincel.ativo && pincel.movendo && pincel.posAnterior && botao==="lapis"){
+            desenharlapis({pos:pincel.pos,posAnterior:pincel.posAnterior});
+            pincel.movendo=false;
+        }
+        if(pincel.ativo && pincel.movendo && pincel.posAnterior && botao==="borracha"){
+            desenharborracha({pos:pincel.pos,posAnterior:pincel.posAnterior});
+            pincel.movendo=false;
+        }
+        pincel.posAnterior={x:pincel.pos.x,y:pincel.pos.y}
+        setTimeout(ciclo,50);
+       }
+       ciclo();
+    })
+    //Como vou fazer com a linha , circulo, recortar e colar? com camadas, talvez...
+ 
+    var canvas = document.getElementById('tela'),
+    contexto = canvas.getContext('2d'),
+    font = `25px sans-serif`,
+    hasInput = false;
+
+//No click ele chama a funçao addInput com a localicaçao em offset (posso colocar dentro de onmousedown);   
+canvas.onclick = function(e) {
+
+    if (hasInput) return;
+    adicionaInput(e.offsetX, e.offsetY);
+    
+}
+ 
+//Adiciona o input de txt na tela do canvas
+function adicionaInput(x, y) {
+    
+    var input = document.createElement('input');
+if(botao==="texto"){
+    input.type = 'text';
+    input.style.position = 'fixed';
+    input.style.left = (x) + 'px';
+    input.style.top = (y) + 'px';
+
+    input.onkeydown = handleEnter;
+
+    document.body.appendChild(input);
+
+    input.focus();
+
+    hasInput = true;
+}
+}
+
+//Recebe o texto no input txt criado
+function handleEnter(e) {
+    var keyCode = e.keyCode;
+    if (keyCode === 13) {
+        drawText(this.value, parseInt(this.style.left, 10), parseInt(this.style.top, 10));
+        document.body.removeChild(this);
+        hasInput = false;
+    }
+}
+
+//Desenha o texto no canvas
+function drawText(txt, x, y) {
+    contexto.textBaseline = 'top';
+    contexto.textAlign = 'left';
+    contexto.font = font;
+    contexto.fillStyle=document.getElementById('cores').value;
+    contexto.fillText(txt, x - 4, y - 4);
+}
+document.getElementById('imagem').onchange = function(e) {
+    console.log(`oi`)
+  var img = new Image();
+  img.onload = draw;
+  img.onerror = failed;
+  img.src = URL.createObjectURL(this.files[0]);
+};
+function draw() {
+  var canvas = document.getElementById('tela');
+  canvas.width = this.width;
+  canvas.height = this.height;
+  var contexto = canvas.getContext('2d');
+  contexto.drawImage(this, 0,0);
+}
+function failed() {
+  console.error("The provided file couldn't be loaded as an Image media");
+}
+
+    </script>
+</body>
+</html>
