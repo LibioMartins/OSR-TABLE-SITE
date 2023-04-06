@@ -9,6 +9,9 @@
         *{
             font-size: 1.2em;
         }
+        p{
+            white-space: nowrap; 
+        }
         body{
             background-color:rgb(192, 192, 192);
         }
@@ -66,6 +69,7 @@
         var pontox=0
         var pontoy=0
         var clickado=0
+        var can 
 
         document.onkeydown = function(e) {//Atalhos teclado(melhorar)
          if(e.key==="q" && hasInput===false){
@@ -147,36 +151,11 @@
        //Detecta mouse pressionado e registra pontos.
        tela.onmousedown = (evento)=>{pincel.ativo=true
         if(botao==="reta" || botao==="circulo" || botao==="retangulo"){
-        clickado=clickado+1    
-        }
-        if((botao==="reta" || botao==="circulo" || botao==="retangulo") && clickado===1){
+        clickado=clickado+1  
         pontox=evento.offsetX;
-        pontoy=evento.offsetY;
-       }
-
-       if((botao==="reta" || botao==="circulo" || botao==="retangulo") && clickado===2){
-        const canvas = document.getElementById("tela");
-        const contexto = canvas.getContext("2d");
-        contexto.strokeStyle=document.getElementById('cores').value;
-        contexto.lineWidth=largura.value;
-        if(botao==="retangulo"){
-        contexto.beginPath();
-        contexto.strokeRect(pontox,pontoy,Math.abs(evento.offsetX-pontox),Math.abs(evento.offsetY-pontoy));
-        contexto.stroke();    
+        pontoy=evento.offsetY;  
         }
-        if(botao==="circulo"){
-        contexto.beginPath();
-        contexto.arc(pontox, pontoy, Math.abs(evento.offsetX-pontox), 0, Math.PI * 2, true);
-        contexto.stroke();
-        }
-        if(botao==="reta"){
-        contexto.beginPath();
-        contexto.moveTo(pontox,pontoy);
-        contexto.lineTo(evento.offsetX,evento.offsetY);
-        contexto.stroke();
-        }
-        clickado=0
-       }
+        
        
        };
        tela.onmouseup = (evento) => {pincel.ativo=false};
@@ -187,7 +166,8 @@
         pincel.pos.y=evento.offsetY
         pincel.movendo=true;
        }
-
+      
+       
        // Repete a funçao lapis e borracha para criar efeito de desenho.
        const ciclo =()=>{
         if(pincel.ativo && pincel.movendo && pincel.posAnterior && botao==="lapis"){
@@ -210,7 +190,7 @@
     font = `25px sans-serif`,
     hasInput = false;
 
-//No click ele chama a funçao addInput com a localicaçao em offset (posso colocar dentro de onmousedown);   
+//No click ele chama a funçao addInput com a localicaçao   
 canvas.onclick = function(e) {
 
     if (hasInput) return;
@@ -218,11 +198,11 @@ canvas.onclick = function(e) {
     
 }
  
-//Adiciona o input de txt na tela do canvas
+//Adiciona o input txt e o input canvas na tela do canvas id tela
 function adicionaInput(x, y) {
     
-    var input = document.createElement('input');
 if(botao==="texto"){
+    var input = document.createElement('input');
     input.type = 'text';
     input.style.position = 'fixed';
     input.style.left = (x) + 'px';
@@ -232,13 +212,71 @@ if(botao==="texto"){
 
     document.body.appendChild(input);
 
-    input.focus();
-
     hasInput = true;
 }
+if(botao==="retangulo" || botao==="circulo" || botao==="reta"){//Sincronizar e criar no primeiro click(vou ter que trazer o desenho pra ca)
+    
+    var can=document.createElement("canvas"); 
+        can.height='5000'
+        can.width='8000'
+        can.style.position='absolute';
+        can.style.left ='8px';
+        can.style.top ='111px';
+        can.style.background='none'
+        can.style.borderBlockColor="lime"
+       
+        can.onmousemove=(evento)=>{
+        var ctx=can.getContext("2d");
+            ctx.clearRect(0,0,8000,5000);
+            ctx.strokeStyle=document.getElementById('cores').value;
+            ctx.lineWidth=largura.value;
+            if(botao==="retangulo"){
+                ctx.strokeRect(pontox, pontoy,Math.abs(evento.offsetX-pontox),Math.abs(evento.offsetY-pontoy));
+            }
+            if(botao==="circulo"){
+                ctx.beginPath();
+                ctx.arc(pontox,pontoy,Math.abs(evento.offsetX-pontox), 0, 2 * Math.PI);
+                ctx.stroke();    
+            }
+            if(botao==="reta"){
+                ctx.beginPath();
+                ctx.moveTo(pontox,pontoy);
+                ctx.lineTo(evento.offsetX,evento.offsetY);
+                ctx.stroke(); 
+            }
+           
+       }
+        document.body.appendChild(can);
+        hasInput = true;
+        can.onmousedown=(evento)=>{
+        document.body.removeChild(can);
+        hasInput = false;
+        clickado=0
+        const canvas = document.getElementById("tela");
+        const contexto = canvas.getContext("2d");
+        contexto.strokeStyle=document.getElementById('cores').value;
+        contexto.lineWidth=largura.value;
+        //ta ficando maior e eu nao sei pq
+        if(botao==="retangulo"){
+                contexto.strokeRect(pontox,pontoy,Math.abs(evento.offsetX-pontox)-12,Math.abs(evento.offsetY-pontoy)-115);
+        }
+        if(botao==="circulo"){
+                contexto.beginPath();
+                contexto.arc(pontox,pontoy,Math.abs(evento.offsetX-pontox)-12, 0, 2 * Math.PI);
+                contexto.stroke();    
+            }
+        if(botao==="reta"){
+                contexto.beginPath();
+                contexto.moveTo(pontox,pontoy);
+                contexto.lineTo(evento.offsetX-12,evento.offsetY-115);
+                contexto.stroke(); 
+            }    
+       }
+        
+}
 }
 
-//Recebe o texto no input txt criado
+//Remove o input txt criado e aciona a funçao drawtext
 function handleEnter(e) {
     var keyCode = e.keyCode;
     if (keyCode === 13) {
@@ -248,6 +286,7 @@ function handleEnter(e) {
     }
 }
 
+
 //Desenha o texto no canvas
 function drawText(txt, x, y) {
     contexto.textBaseline = 'top';
@@ -256,6 +295,7 @@ function drawText(txt, x, y) {
     contexto.fillStyle=document.getElementById('cores').value;
     contexto.fillText(txt, x - 4, y - 4);
 }
+
 document.getElementById('imagem').onchange = function(e) {
     console.log(`oi`)
   var img = new Image();
