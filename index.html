@@ -8,6 +8,10 @@
     <style>
         *{
             font-size: 1.2em;
+            
+        }
+        abbr{
+            text-decoration: none;
         }
         p{
             white-space: nowrap; 
@@ -33,12 +37,13 @@
 <body>
     <p> 
         <abbr title="Quadrado(q)"><input type="button" value="&#9744" onclick="retangulo()"></abbr>
-        <abbr title="Circulo"><input type="button" value="&#9737" onclick="circulo()"></abbr>
+        <abbr title="Circulo(c)"><input type="button" value="&#9737" onclick="circulo()"></abbr>
         <abbr title="Reta(r)"><input type="button" value="&#9866" onclick="reta()"></abbr>
         <abbr title="Lapis(l)"><input type="button" value="&#x270E" onclick="lapis()"></abbr>
         <abbr title="Borracha(b)"><input type="button" value="&#x2751" onclick="borracha()"></abbr>
+        <abbr title="nao há nada aqui"><input type="button" value="&#x2702" onclick="tesoura()"></abbr>
         <input type="button" value="Texto(t)" onclick="texto()">
-        <input id="largura" type="range"  min="1" value="0" max="50" list="ticks" oninput="Output.value = largura.value"list="tickmarks" >
+        <abbr title="Use '+'' e '-' para modificar"><input id="largura" type="range"  min="1" value="0" max="50" list="ticks" oninput="Output.value = largura.value"list="tickmarks" ></abbr>
         <output id="Output">1</output>
         <select id="cores">
             <option value="white">White</option>
@@ -57,8 +62,10 @@
             <option value="Orange" style="background-color: Orange;">Orange</option>
             <option value="Yellow" style="background-color: Yellow;">Yellow</option>
         </select>
-        Escala:<input type="button" value="&#43" onclick="imagemMais()">
-        <input type="button" value="&#8722" onclick="imagemMenos()">
+        <abbr title="Use os botoes para alterar a escala do mapa">
+            Escala:<input type="button" value="&#43" onclick="imagemMais()">
+            <input type="button" value="&#8722" onclick="imagemMenos()">
+        </abbr>
         <input type="file" id="imagem" accept=".jpg, .jpeg, .png" multiple />
     </p>
     <canvas id="tela" width="8000" height="5000"><script>
@@ -84,8 +91,8 @@
             }
         }
         function imagemMenos(){
-            if(cont===0){
-                cont=0
+            if(cont===-3){
+                cont=-3
         document.getElementById('tela').style.backgroundImage = `url('Sem\ título${cont}.png')`  
             }else{
                 cont=cont-1
@@ -136,6 +143,9 @@
         }
         function borracha(){
             botao="borracha"
+        }
+        function tesoura(){
+            botao="tesoura"
         }
         function texto(){
             botao="texto";
@@ -236,7 +246,36 @@ if(botao==="texto"){
 
     hasInput = true;
 }
-if(botao==="retangulo" || botao==="circulo" || botao==="reta"){//Sincronizar e criar no primeiro click(vou ter que trazer o desenho pra ca)
+if(botao==="tesoura"){
+     
+    var can=document.createElement("canvas"); 
+        can.style.position='absolute';
+        can.style.background='none'
+        can.style.borderBlockColor="red"
+        tela.onmousemove=(evento)=>{
+            
+            can.style.left =pontox+'8px';
+            can.style.top =pontoy+'111px';
+            can.width=Math.abs(evento.offsetX-pontox)
+            can.height=Math.abs(evento.offsetY-pontoy)
+            
+        }
+        document.body.appendChild(can);
+        hasInput = true;
+        can.onmousedown=(evento)=>{
+        pontoy=evento.offsetY-pontoy
+        pontox=evento.offsetX-pontox
+        document.body.removeChild(can);
+        hasInput = false;
+        clickado=0
+        const canvas = document.getElementById("tela");
+        const contexto = canvas.getContext("2d");
+        contexto.strokeStyle=document.getElementById('cores').value;
+        contexto.lineWidth=largura.value;
+        }
+    
+}
+if(botao==="retangulo" || botao==="circulo" || botao==="reta"){
     
     var can=document.createElement("canvas"); 
         can.height='5000'
@@ -253,7 +292,7 @@ if(botao==="retangulo" || botao==="circulo" || botao==="reta"){//Sincronizar e c
             ctx.strokeStyle=document.getElementById('cores').value;
             ctx.lineWidth=largura.value;
             if(botao==="retangulo"){
-                ctx.strokeRect(pontox, pontoy,Math.abs(evento.offsetX-pontox),Math.abs(evento.offsetY-pontoy));
+                ctx.strokeRect(pontox, pontoy,(evento.offsetX-pontox),(evento.offsetY-pontoy));
             }
             if(botao==="circulo"){
                 ctx.beginPath();
@@ -278,9 +317,9 @@ if(botao==="retangulo" || botao==="circulo" || botao==="reta"){//Sincronizar e c
         const contexto = canvas.getContext("2d");
         contexto.strokeStyle=document.getElementById('cores').value;
         contexto.lineWidth=largura.value;
-        //ta ficando maior e eu nao sei pq
+        
         if(botao==="retangulo"){
-                contexto.strokeRect(pontox,pontoy,Math.abs(evento.offsetX-pontox)-12,Math.abs(evento.offsetY-pontoy)-115);
+                contexto.strokeRect(pontox,pontoy,(evento.offsetX-pontox)-12,(evento.offsetY-pontoy)-115);
         }
         if(botao==="circulo"){
                 contexto.beginPath();
@@ -293,10 +332,10 @@ if(botao==="retangulo" || botao==="circulo" || botao==="reta"){//Sincronizar e c
                 contexto.lineTo(evento.offsetX-12,evento.offsetY-115);
                 contexto.stroke(); 
             }    
-       }
-        
+       }     
 }
 }
+
 
 //Remove o input txt criado e aciona a funçao drawtext
 function handleEnter(e) {
@@ -319,7 +358,6 @@ function drawText(txt, x, y) {
 }
 
 document.getElementById('imagem').onchange = function(e) {
-    console.log(`oi`)
   var img = new Image();
   img.onload = draw;
   img.onerror = failed;
