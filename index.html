@@ -45,23 +45,44 @@
         <input type="button" value="Texto(t)" onclick="texto()">
         <abbr title="Use '+'' e '-' para modificar"><input id="largura" type="range"  min="1" value="0" max="50" list="ticks" oninput="Output.value = largura.value"list="tickmarks" ></abbr>
         <output id="Output">1</output>
-        <select id="cores">
-            <option value="white">White</option>
-            <option value="DarkGray" style="background-color: DarkGray;">DarkGray</option>
-            <option value="Black" style="background-color: black; color: white;">Black</option>
-            <option value="SlateBlue" style="background-color:SlateBlue;">SlateBlue</option>
-            <option value="DeepSkyBlue" style="background-color: DeepSkyBlue;">DeepSkyBlue</option>
-            <option value="Cyan"style="background-color: Cyan">Cyan</option>
-            <option  value="Blue" style="background-color: blue; color: white;">Blue</option>
-            <option value="lime" style="background-color: lime;">lime</option>
-            <option value="SaddleBrown" style="background-color: SaddleBrown;">SaddleBrown</option>
-            <option value="Purple" style="background-color: Purple;">Purple</option>
-            <option value="DeepPink" style="background-color:DeepPink;">DeepPink</option>
-            <option value="Red" style="background-color: Red
-            ;">Red</option>
-            <option value="Orange" style="background-color: Orange;">Orange</option>
-            <option value="Yellow" style="background-color: Yellow;">Yellow</option>
-        </select>
+        <abbr title="Cor principal">
+            <select id="cores">
+                <option value="white">White</option>
+                <option value="DarkGray" style="background-color: DarkGray;">DarkGray</option>
+                <option value="Black" style="background-color: black; color: white;">Black</option>
+                <option value="SlateBlue" style="background-color:SlateBlue;">SlateBlue</option>
+                <option value="DeepSkyBlue" style="background-color: DeepSkyBlue;">DeepSkyBlue</option>
+                <option value="Cyan"style="background-color: Cyan">Cyan</option>
+                <option  value="Blue" style="background-color: blue; color: white;">Blue</option>
+                <option value="lime" style="background-color: lime;">lime</option>
+                <option value="SaddleBrown" style="background-color: SaddleBrown;">SaddleBrown</option>
+                <option value="Purple" style="background-color: Purple;">Purple</option>
+                <option value="DeepPink" style="background-color:DeepPink;">DeepPink</option>
+                <option value="Red" style="background-color: Red
+                ;">Red</option>
+                <option value="Orange" style="background-color: Orange;">Orange</option>
+                <option value="Yellow" style="background-color: Yellow;">Yellow</option>
+            </select>
+        </abbr>
+        <abbr title="Cor de fundo">
+            <select id="cor2">
+                <option value="white">White</option>
+                <option value="DarkGray" style="background-color: DarkGray;">DarkGray</option>
+                <option value="Black" style="background-color: black; color: white;">Black</option>
+                <option value="SlateBlue" style="background-color:SlateBlue;">SlateBlue</option>
+                <option value="DeepSkyBlue" style="background-color: DeepSkyBlue;">DeepSkyBlue</option>
+                <option value="Cyan"style="background-color: Cyan">Cyan</option>
+                <option  value="Blue" style="background-color: blue; color: white;">Blue</option>
+                <option value="lime" style="background-color: lime;">lime</option>
+                <option value="SaddleBrown" style="background-color: SaddleBrown;">SaddleBrown</option>
+                <option value="Purple" style="background-color: Purple;">Purple</option>
+                <option value="DeepPink" style="background-color:DeepPink;">DeepPink</option>
+                <option value="Red" style="background-color: Red
+                ;">Red</option>
+                <option value="Orange" style="background-color: Orange;">Orange</option>
+                <option value="Yellow" style="background-color: Yellow;">Yellow</option>
+            </select>
+        </abbr>
         <abbr title="Use os botoes para alterar a escala do mapa">
             Escala:<input type="button" value="&#43" onclick="imagemMais()">
             <input type="button" value="&#8722" onclick="imagemMenos()">
@@ -219,7 +240,6 @@
  
     var canvas = document.getElementById('tela'),
     contexto = canvas.getContext('2d'),
-    font = `25px sans-serif`,
     hasInput = false;
 
 //No click ele chama a funçao addInput com a localicaçao   
@@ -246,35 +266,7 @@ if(botao==="texto"){
 
     hasInput = true;
 }
-if(botao==="tesoura"){
-     
-    var can=document.createElement("canvas"); 
-        can.style.position='absolute';
-        can.style.background='none'
-        can.style.borderBlockColor="red"
-        tela.onmousemove=(evento)=>{
-            
-            can.style.left =pontox+'8px';
-            can.style.top =pontoy+'111px';
-            can.width=Math.abs(evento.offsetX-pontox)
-            can.height=Math.abs(evento.offsetY-pontoy)
-            
-        }
-        document.body.appendChild(can);
-        hasInput = true;
-        can.onmousedown=(evento)=>{
-        pontoy=evento.offsetY-pontoy
-        pontox=evento.offsetX-pontox
-        document.body.removeChild(can);
-        hasInput = false;
-        clickado=0
-        const canvas = document.getElementById("tela");
-        const contexto = canvas.getContext("2d");
-        contexto.strokeStyle=document.getElementById('cores').value;
-        contexto.lineWidth=largura.value;
-        }
-    
-}
+
 if(botao==="retangulo" || botao==="circulo" || botao==="reta"){
     
     var can=document.createElement("canvas"); 
@@ -352,9 +344,13 @@ function handleEnter(e) {
 function drawText(txt, x, y) {
     contexto.textBaseline = 'top';
     contexto.textAlign = 'left';
-    contexto.font = font;
+    contexto.font = `25px arial`;
+    contexto.strokeStyle=document.getElementById('cor2').value;
+    contexto.lineWidth=`1`
     contexto.fillStyle=document.getElementById('cores').value;
+    contexto.strokeText(txt, x - 4, y - 4);
     contexto.fillText(txt, x - 4, y - 4);
+    
 }
 
 document.getElementById('imagem').onchange = function(e) {
