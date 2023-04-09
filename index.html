@@ -213,21 +213,9 @@
         pontoy=evento.offsetY;  
         }
        if(botao==="tesoura"){
-       if(tes===0){
         pontox=evento.offsetX;
         pontoy=evento.offsetY;
-       } 
-       if(tes===1){
-        w=evento.offsetX-pontox
-        h=evento.offsetY-pontoy
-       }
-       if(tes===2){
-        var img = document.getElementById("tela");
-        contexto.drawImage(img,pontox,pontoy,w,h,evento.offsetX,evento.offsetY,w,h);
-        contexto.clearRect(pontox,pontoy,w,h);
-        tes=-1
-       }
-       tes=tes+1
+        tes=0
        } 
        
        };
@@ -321,7 +309,7 @@ if(botao==="retangulo" || botao==="circulo" || botao==="reta"){
        }
         document.body.appendChild(can);
         hasInput = true;
-        can.onmousedown=(evento)=>{
+    can.onmousedown=(evento)=>{
         document.body.removeChild(can);
         hasInput = false;
         clickado=0
@@ -344,8 +332,54 @@ if(botao==="retangulo" || botao==="circulo" || botao==="reta"){
                 contexto.lineTo(evento.offsetX-12,evento.offsetY-115);
                 contexto.stroke(); 
             }    
-       }     
+    }     
 }
+if(botao==="tesoura"){// desenha e depois apaga :/
+    var can=document.createElement("canvas"); 
+        can.height='5000'
+        can.width='8000'
+        can.style.position='absolute';
+        can.style.left ='8px';
+        can.style.top ='111px';
+        can.style.background='none'
+        can.style.borderBlockColor="lime"
+
+        document.body.appendChild(can);
+        hasInput = true;
+ 
+        can.onmousedown=(evento)=>{
+       if(tes===1){
+        var img = document.getElementById("tela");
+        contexto.drawImage(img,pontox,pontoy,w,h,evento.offsetX,evento.offsetY,w,h);
+        tes=0
+        document.body.removeChild(can);
+        hasInput = false;
+        contexto.clearRect(pontox,pontoy,w,h);
+       }
+       if(tes===0){
+        w=evento.offsetX-pontox
+        h=evento.offsetY-pontoy
+        tes=tes+1
+       }
+
+       }
+       can.onmousemove=(evento)=>{
+        console.log(`${tes}`);
+        if(tes===0){
+            var ctx=can.getContext("2d");
+            ctx.clearRect(0,0,8000,5000);
+            ctx.strokeRect(pontox,pontoy,evento.offsetX-pontox,evento.offsetY-pontoy);
+        }
+        if(tes===1){
+            var ctx=can.getContext("2d");
+            ctx.clearRect(0,0,8000,5000);
+            ctx.strokeRect(evento.offsetX,evento.offsetY,w,h);
+            var img = document.getElementById("tela");
+            ctx.drawImage(img,pontox,pontoy,w,h,evento.offsetX,evento.offsetY,w,h);
+        }
+
+       }
+    }
 }
 
 
